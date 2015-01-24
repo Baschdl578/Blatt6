@@ -83,6 +83,10 @@ public class Levenshtein {
         return w2.charAt(i) == w1.charAt(j) ? getDistanceAt(i - 1, j - 1) : getDistanceAt(i - 1, j - 1) + 1;
     }
 
+    /**
+     * Calculates and returns the normalized distance
+     * @return the normalized distance
+     */
     public double getNormalizedLevenshteinDistance() {
         double dist = getDistance();
 

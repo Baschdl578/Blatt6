@@ -1,4 +1,4 @@
-package A;
+package edu.kit.informatik.A;
 
 import edu.kit.informatik.Terminal;
 
