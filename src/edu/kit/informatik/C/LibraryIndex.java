@@ -1,11 +1,9 @@
 package edu.kit.informatik.C;
 
 
-import edu.kit.informatik.Levenshtein;
 import edu.kit.informatik.Terminal;
 
 import java.util.Locale;
-import java.util.TreeMap;
 
 /**
  * @author Sebastian Schindler
@@ -29,36 +27,59 @@ public class LibraryIndex {
         }
 
         allBooks = Reader.read(args[1]);
+        parseBooks();
     }
 
-    private static boolean evalLine(String title, String year, String creator, String line) {
-        boolean out = false;
-
-        String[] attribs = line.split(",");
-
-        for (String attrib: attribs) {
-            if (title != null && attrib.substring(0, 5).toLowerCase(Locale.ENGLISH).equals("title")) {
-                    Levenshtein titleLev = new Levenshtein(attrib.substring(6), title);
-                    if (titleLev.getNormalizedLevenshteinDistance() < threshold) {
-                        out = true;
-                    }
-            }
-            if (creator != null && attrib.substring(0, 7).toLowerCase(Locale.ENGLISH).equals("creator")) {
-                    Levenshtein creatorLev = new Levenshtein(attrib.substring(8), creator);
-                    if (creatorLev.getNormalizedLevenshteinDistance() < threshold) {
-                        out = true;
-                    }
-            }
-            if (year != null && attrib.substring(0, 4).toLowerCase(Locale.ENGLISH).equals("year")) {
-                Levenshtein yearLev = new Levenshtein(attrib.substring(5), year);
-                if (yearLev.getNormalizedLevenshteinDistance() < threshold) {
-                    out = true;
+    private static void parseBooks() {
+        String[] tmp = new String[allBooks.length];
+        for (int i = 0; i < allBooks.length; i++) {
+            String[] attribs = allBooks[i].split(",");
+            boolean missTitle = true;
+            boolean missCreator = true;
+            boolean missYear = true;
+            for (String attrib: attribs) {
+                if (attrib.substring(0, 5).toLowerCase(Locale.ENGLISH).equals("title")) {
+                    missTitle = false;
+                }
+                if (attrib.substring(0, 7).toLowerCase(Locale.ENGLISH).equals("creator")) {
+                    missCreator = false;
+                }
+                if (attrib.substring(0, 4).toLowerCase(Locale.ENGLISH).equals("year")) {
+                    missYear = false;
                 }
             }
+            String tmpBook = allBooks[i];
+            if (missCreator) {
+                tmpBook += ",creator=unknown";
+            }
+            if (missTitle) {
+                tmpBook += ",title=unknown";
+            }
+            if (missYear) {
+                tmpBook += ",year=unknown";
+            }
+            tmp[i] = tmpBook;
         }
+        allBooks = tmp;
+    }
 
+    private static void getInput() {
+        String[] commands = Terminal.readLine().split(" ");
 
-        return out;
+        if (commands[0].equals("quit")) {
+            System.exit(0);
+        }
+        if (!commands[0].equals("search")) {
+            Terminal.printLine("Error, unknown command!\n" +
+                    "Please input \"search\" followed by \"keyword=value\"");
+        } else {
+            String request = "";
+            for (int i = 1; i < commands.length; i++) {
+                request += " " + commands[i];
+            }
+            Search.searchAndPrint(request, threshold, allBooks);
+        }
+        getInput();
     }
 
     /**
@@ -67,7 +88,7 @@ public class LibraryIndex {
      */
     public static void main(String[] args) {
         init(args);
-
+        getInput();
     }
 
 
