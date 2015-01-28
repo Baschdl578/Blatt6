@@ -15,35 +15,31 @@ public class Search {
         float distance1 = 1f;
         float distance2 = 1f;
         boolean or = false;
-        String tmpRequest = request.substring(4, request.length() - 1);
-        if (tmpRequest.startsWith("(")) {
-            tmpRequest = tmpRequest.substring(1);
-        }
 
-        request = request.trim();
+        String trimRequest = request.trim();
+        String tmpRequest = trimRequest.substring(4, trimRequest.length() - 1);
 
-
-        if (!request.substring(0, 3).equals("OR(") && !request.substring(0, 4).equals("AND(")) {
-            return getSingleDistance(request, line);
+        if (!trimRequest.substring(0, 3).equals("OR(") && !trimRequest.substring(0, 4).equals("AND(")) {
+            return getSingleDistance(trimRequest, line);
         }
 
 
-        if (request.substring(0, 3).equals("OR(")) {
+        if (trimRequest.substring(0, 3).equals("OR(")) {
             or = true;
-            tmpRequest = request.substring(4, request.length() - 1);
+            tmpRequest = trimRequest.substring(3, trimRequest.length() - 1);
         }
-        String[] requests = tmpRequest.split(", ");
+        String[] requests = tmpRequest.split(",");
         if (requests.length == 2) {
             distance1 = getSingleDistance(requests[0], line);
             distance2 = getSingleDistance(requests[1], line);
         }
         if (requests.length == 3) {
             if (requests[0].substring(0, 3).equals("OR(") || requests[0].substring(0, 4).equals("AND(")) {
-                distance1 = getLineDistance(requests[0] + ", " + requests[1], line, allbooks);
+                distance1 = getLineDistance(requests[0] + "," + requests[1], line, allbooks);
                 distance2 = getSingleDistance(requests[2], line);
             }
             if (requests[1].substring(0, 3).equals("OR(") || requests[1].substring(0, 4).equals("AND(")) {
-                distance1 = getLineDistance(requests[1] + ", " + requests[2], line, allbooks);
+                distance1 = getLineDistance(requests[1] + "," + requests[2], line, allbooks);
                 distance2 = getSingleDistance(requests[0], line);
             }
         }
@@ -65,7 +61,7 @@ public class Search {
         String year = "";
         String creator = "";
 
-        request = request.trim();
+        String trmRequest = request.trim();
 
         String[] attribs = line.split(",");
         for (String attrib : attribs) {
@@ -80,30 +76,30 @@ public class Search {
             }
         }
 
-        if (request.substring(0, 5).toLowerCase(Locale.ENGLISH).equals("title")) {
+        if (trmRequest.substring(0, 5).toLowerCase(Locale.ENGLISH).equals("title")) {
             if (title.equals("unknown")) {
                 return 1f;
             }
-            Levenshtein lev = new Levenshtein(title, request.substring(6));
+            Levenshtein lev = new Levenshtein(title, trmRequest.substring(6));
             return new Float(lev.getNormalizedLevenshteinDistance());
         }
-        if (request.substring(0, 7).toLowerCase(Locale.ENGLISH).equals("creator")) {
+        if (trmRequest.substring(0, 7).toLowerCase(Locale.ENGLISH).equals("creator")) {
             if (creator.equals("unknown")) {
                 return 1f;
             }
-            Levenshtein lev = new Levenshtein(creator, request.substring(8));
+            Levenshtein lev = new Levenshtein(creator, trmRequest.substring(8));
             return new Float(lev.getNormalizedLevenshteinDistance());
         }
-        if (request.substring(0, 4).toLowerCase(Locale.ENGLISH).equals("year")) {
+        if (trmRequest.substring(0, 4).toLowerCase(Locale.ENGLISH).equals("year")) {
             if (year.equals("unknown")) {
                 return 1f;
             }
-            Levenshtein lev = new Levenshtein(year, request.substring(5));
+            Levenshtein lev = new Levenshtein(year, trmRequest.substring(5));
             return new Float(lev.getNormalizedLevenshteinDistance());
         }
 
-        Terminal.printLine("Error, unknown command!\n" +
-                "Please input \"search\" followed by \"keyword=value\"");
+        Terminal.printLine("Error, unknown command!\n"
+                + "Please input \"search\" followed by \"keyword=value\"");
         System.exit(1);
         return 1f;
     }

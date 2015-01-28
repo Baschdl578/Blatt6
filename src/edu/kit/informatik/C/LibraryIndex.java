@@ -37,27 +37,21 @@ public class LibraryIndex {
             boolean missTitle = true;
             boolean missCreator = true;
             boolean missYear = true;
+            String title = "title=unknown";
+            String creator = "creator=unknown";
+            String year = "year=unknown";
             for (String attrib: attribs) {
                 if (attrib.substring(0, 5).toLowerCase(Locale.ENGLISH).equals("title")) {
-                    missTitle = false;
+                    title = attrib.toLowerCase(Locale.ENGLISH);
                 }
                 if (attrib.substring(0, 7).toLowerCase(Locale.ENGLISH).equals("creator")) {
-                    missCreator = false;
+                    creator = attrib.toLowerCase(Locale.ENGLISH);
                 }
                 if (attrib.substring(0, 4).toLowerCase(Locale.ENGLISH).equals("year")) {
-                    missYear = false;
+                    year = attrib.toLowerCase(Locale.ENGLISH);
                 }
             }
-            String tmpBook = allBooks[i];
-            if (missCreator) {
-                tmpBook += ",creator=unknown";
-            }
-            if (missTitle) {
-                tmpBook += ",title=unknown";
-            }
-            if (missYear) {
-                tmpBook += ",year=unknown";
-            }
+            String tmpBook = creator + "," + title + "," + year;
             tmp[i] = tmpBook;
         }
         allBooks = tmp;
@@ -70,14 +64,10 @@ public class LibraryIndex {
             System.exit(0);
         }
         if (!commands[0].equals("search")) {
-            Terminal.printLine("Error, unknown command!\n" +
-                    "Please input \"search\" followed by \"keyword=value\"");
+            Terminal.printLine("Error, unknown command!\n"
+                    + "Please input \"search\" followed by \"keyword=value\".");
         } else {
-            String request = "";
-            for (int i = 1; i < commands.length; i++) {
-                request += " " + commands[i];
-            }
-            Search.searchAndPrint(request, threshold, allBooks);
+            Search.searchAndPrint(commands[1], threshold, allBooks);
         }
         getInput();
     }
